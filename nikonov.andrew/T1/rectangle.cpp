@@ -1,17 +1,70 @@
 #include "rectangle.hpp"
+#include <cmath>
+#include <limits>
 #include "additional-utilities.hpp"
-nikonov::Rectangle::Rectangle(const point_t &lbp, const point_t &rtp):
-  lbp_(lbp),
-  rtp_(rtp)
+namespace
 {
-  if (lbp.x >= rtp.x || lbp.y >= rtp.y)
+  nikonov::point_t findLbp(double tgls[])
   {
-    throw std::logic_error("ERROR:noncorrect rectangle parameters");
+    constexpr size_t triangleNum = 4;
+    constexpr size_t rectangleEdgesNum = 4;
+    double minY = std::numeric_limits<double>::min();
+    double minX = std::numeric_limits<double>::min();
+    double edgesCnt = 0.0;
+    for (size_t i = 0; i < triangleNum; ++i)
+    {
+      for (size_t j = 1; j < triangleNum - i; ++j)
+      {
+        if (tgls[i].getFrameRect().height == tgls[j].getFrameRect().height ||
+          tgls[i].getFrameRect().width == tgls[j].getFrameRect().width)
+        {
+          ++edgesCnt;
+        }
+      }
+    }
+    if (edgesCnt != rectangleEdgesNum)
+    {
+      throw std::logic_error("non-correct rectangle parameters");
+    }
+    double trianglesArea = tgl_1.getArea() + tgl_2.getArea() + tgl_3.getArea() + tgl_4.getArea();
+    //если площадь тругольников будет сопадать с площадью ограничевающего прямоугольника, и количество граней будет равно четырем, то такие треугольники 
+    //подходят для построения прямоугольника.
   }
+}
+nikonov::Rectangle::Rectangle(const Triangle &tgl_1, const Triangle &tgl_2, const Triangle &tgl_3, const Triangle &tgl_4):
+  tgl_1_(tgl_1),
+  tgl_2_(tgl_2),
+  tgl_3_(tgl_3),
+  tgl_4_(tgl_4)
+{
+  constexpr size_t triangleNum = 4;
+    constexpr size_t rectangleEdgesNum = 4;
+    nikonov::Triangle tgls[] = { tgl_1, tgl_2, tgl_3, tgl_4 };
+    double minY = std::numeric_limits<double>::min();
+    double minX = std::numeric_limits<double>::min();
+    double edgesCnt = 0.0;
+    for (size_t i = 0; i < triangleNum; ++i)
+    {
+      for (size_t j = 1; j < triangleNum - i; ++j)
+      {
+        if (tgls[i].getFrameRect().height == tgls[j].getFrameRect().height ||
+          tgls[i].getFrameRect().width == tgls[j].getFrameRect().width)
+        {
+          ++edgesCnt;
+        }
+      }
+    }
+    if (edgesCnt != rectangleEdgesNum)
+    {
+      throw std::logic_error("non-correct rectangle parameters");
+    }
+    double trianglesArea = tgl_1.getArea() + tgl_2.getArea() + tgl_3.getArea() + tgl_4.getArea();
+    //если площадь тругольников будет сопадать с площадью ограничевающего прямоугольника, и количество граней будет равно четырем, то такие треугольники 
+    //подходят для построения прямоугольника.
 }
 double nikonov::Rectangle::getArea() const noexcept
 {
-  return ((rtp_.x - lbp_.x) * (rtp_.y - lbp_.y));
+  return tgl_1_.getArea() + tgl_2_.getArea() + tgl_3_.getArea() + tgl_4_.getArea();
 }
 nikonov::rectangle_t nikonov::Rectangle::getFrameRect() const noexcept
 {
