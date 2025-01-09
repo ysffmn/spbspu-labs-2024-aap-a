@@ -2,6 +2,7 @@
 #define RECTANGE_HPP
 #include "base-types.hpp"
 #include "shape.hpp"
+#include "triangle.hpp"
 namespace nikonov
 {
   class Rectangle final: public Shape
@@ -14,8 +15,10 @@ namespace nikonov
     void move(double x, double y) override;
     void scale(double k) noexcept override;
   private:
-    point_t lbp_;
-    point_t rtp_;
+    Triangle left_tgl_;
+    Triangle right_tgl_;
+    Triangle top_tgl_;
+    Triangle bot_tgl_;
   };
 }
 #endif
