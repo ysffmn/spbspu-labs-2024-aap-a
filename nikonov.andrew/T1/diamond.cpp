@@ -45,7 +45,7 @@ nikonov::rectangle_t nikonov::Diamond::getFrameRect() const noexcept
   double width = lt_tgl_.getFrameRect().width * 2;
   double height = lt_tgl_.getFrameRect().height * 2;
   point_t tglCenter = lt_tgl_.getFrameRect().pos;
-  point_t pos = point_t({ tglCenter.x + (width / 4), tglCenter.y + (height / 4) });
+  point_t pos = point_t({ tglCenter.x + (width / 4), tglCenter.y - (height / 4) });
   return rectangle_t({ width, height, pos });
 }
 void nikonov::Diamond::move(const point_t &newPos) noexcept
