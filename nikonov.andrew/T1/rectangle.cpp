@@ -36,27 +36,67 @@ namespace
   {
     return findExtremeCoord(tgls, size, false, false);
   }
-}
-nikonov::Rectangle::Rectangle(const Triangle &tgl_1, const Triangle &tgl_2, const Triangle &tgl_3, const Triangle &tgl_4):
-  tgl_1_(tgl_1),
-  tgl_2_(tgl_2),
-  tgl_3_(tgl_3),
-  tgl_4_(tgl_4)
-{
-  constexpr size_t triangleNum = 4;
-  constexpr size_t rectangleEdgesNum = 4;
-  nikonov::Triangle tgls[] = { tgl_1, tgl_2, tgl_3, tgl_4 };
-  double minY = findMinY(tgls, triangleNum);
-  double minX = findMinX(tgls, triangleNum);
-  double maxY = findMaxY(tgls, triangleNum);
-  double maxX = findMaxX(tgls, triangleNum);
-  double rectWidth = maxX - minX;
-  double rectHeight = maxY - minY;
-  double rectArea = rectWidth * rectHeight;
-  double trianglesSumArea = tgl_1.getArea() + tgl_2.getArea() + tgl_3.getArea() + tgl_4.getArea();
-  if (rectArea != trianglesSumArea)
+  struct RectangleData
   {
-    throw std::logic_error("non-correct rectangle parameters");
+    double minX;
+    double maxX;
+    double minY;
+    double maxY;
+    double width;
+    double height;
+    nikonov::point_t midP;
+    RectangleData(const nikonov::point_t &lbp, const nikonov::point_t &rtp):
+      minX(std::min(lbp.x, rtp.x)),
+      maxX(std::max(lbp.x, rtp.x)),
+      minY(std::min(lbp.y, rtp.y)),
+      maxY(std::max(lbp.y, rtp.y)),
+      width(maxX - minX),
+      height(maxY - minY),
+      midP({ minX + width / 2, minY + height / 2 })
+    {}
+  };
+  nikonov::Triangle findLeftTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
+  {
+    RectangleData data(lbp, rtp);
+    nikonov::point_t topP({ data.minX, data.maxY });
+    nikonov::point_t botP({ data.minX, data.minY });
+    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
+    return nikonov::Triangle({ topP, botP, midP });
+  }
+  nikonov::Triangle findRightTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
+  {
+    RectangleData data(lbp, rtp);
+    nikonov::point_t topP({ data.maxX, data.maxY });
+    nikonov::point_t botP({ data.maxX, data.minY });
+    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
+    return nikonov::Triangle({ topP, botP, midP });
+  }
+  nikonov::Triangle findTopTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
+  {
+    RectangleData data(lbp, rtp);
+    nikonov::point_t topP1({ data.minX, data.maxY });
+    nikonov::point_t topP2({ data.maxX, data.maxY });
+    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
+    return nikonov::Triangle({ topP1, topP2, midP });
+  }
+  nikonov::Triangle findBottomTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
+  {
+    RectangleData data(lbp, rtp);
+    nikonov::point_t botP1({ data.minX, data.minY });
+    nikonov::point_t botP2({ data.maxX, data.minY });
+    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
+    return nikonov::Triangle({ botP1, botP2, midP });
+  }
+}
+nikonov::Rectangle::Rectangle(const point_t &lbp, const point_t &rtp):
+  tgl_1_(findLeftTgl(lbp, rtp)),
+  tgl_2_(findRightTgl(lbp, rtp)),
+  tgl_3_(findTopTgl(lbp, rtp)),
+  tgl_4_(findBottomTgl(lbp, rtp))
+{
+  if (lbp.x >= rtp.x || lbp.y >= rtp.y)
+  {
+    throw std::logic_error("ERROR:noncorrect rectangle parameters");
   }
 }
 double nikonov::Rectangle::getArea() const noexcept

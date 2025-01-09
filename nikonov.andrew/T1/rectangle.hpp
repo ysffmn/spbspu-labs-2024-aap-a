@@ -8,7 +8,7 @@ namespace nikonov
   class Rectangle final: public Shape
   {
   public:
-    Rectangle(const Triangle &tgl_1, const Triangle &tgl_2, const Triangle &tgl_3, const Triangle &tgl_4);
+    Rectangle(const point_t &lbp, const point_t &rtp);
     double getArea() const noexcept override;
     rectangle_t getFrameRect() const noexcept override;
     void move(const point_t &a) noexcept override;
