@@ -20,42 +20,14 @@ namespace
       height(maxY - minY)
     {}
   };
-  nikonov::Triangle findLeftTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
-  {
-    RectangleData data(lbp, rtp);
-    nikonov::point_t topP({ data.minX, data.maxY });
-    nikonov::point_t botP({ data.minX, data.minY });
-    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
-    return nikonov::Triangle({ topP, botP, midP });
-  }
-  nikonov::Triangle findRightTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
-  {
-    RectangleData data(lbp, rtp);
-    nikonov::point_t topP({ data.maxX, data.maxY });
-    nikonov::point_t botP({ data.maxX, data.minY });
-    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
-    return nikonov::Triangle({ topP, botP, midP });
-  }
-  nikonov::Triangle findTopTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
-  {
-    RectangleData data(lbp, rtp);
-    nikonov::point_t topP1({ data.minX, data.maxY });
-    nikonov::point_t topP2({ data.maxX, data.maxY });
-    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
-    return nikonov::Triangle({ topP1, topP2, midP });
-  }
-  nikonov::Triangle findBottomTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
-  {
-    RectangleData data(lbp, rtp);
-    nikonov::point_t botP1({ data.minX, data.minY });
-    nikonov::point_t botP2({ data.maxX, data.minY });
-    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
-    return nikonov::Triangle({ botP1, botP2, midP });
-  }
+  nikonov::Triangle findLeftTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp);
+  nikonov::Triangle findRightTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp);
+  nikonov::Triangle findTopTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp);
+  nikonov::Triangle findBottomTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp);
 }
 nikonov::Rectangle::Rectangle(const point_t &lbp, const point_t &rtp):
-  right_tgl_(findLeftTgl(lbp, rtp)),
-  left_tgl_(findRightTgl(lbp, rtp)),
+  left_tgl_(findLeftTgl(lbp, rtp)),
+  right_tgl_(findRightTgl(lbp, rtp)),
   top_tgl_(findTopTgl(lbp, rtp)),
   bot_tgl_(findBottomTgl(lbp, rtp))
 {
@@ -98,4 +70,39 @@ void nikonov::Rectangle::scale(double k) noexcept
   ispScale(&left_tgl_, crntRect.pos.x, crntRect.pos.y, k);
   ispScale(&top_tgl_, crntRect.pos.x, crntRect.pos.y, k);
   ispScale(&bot_tgl_, crntRect.pos.x, crntRect.pos.y, k);
+}
+namespace
+{
+  nikonov::Triangle findLeftTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
+  {
+    RectangleData data(lbp, rtp);
+    nikonov::point_t topP({ data.minX, data.maxY });
+    nikonov::point_t botP({ data.minX, data.minY });
+    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
+    return nikonov::Triangle({ topP, botP, midP });
+  }
+  nikonov::Triangle findRightTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
+  {
+    RectangleData data(lbp, rtp);
+    nikonov::point_t topP({ data.maxX, data.maxY });
+    nikonov::point_t botP({ data.maxX, data.minY });
+    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
+    return nikonov::Triangle({ topP, botP, midP });
+  }
+  nikonov::Triangle findTopTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
+  {
+    RectangleData data(lbp, rtp);
+    nikonov::point_t topP1({ data.minX, data.maxY });
+    nikonov::point_t topP2({ data.maxX, data.maxY });
+    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
+    return nikonov::Triangle({ topP1, topP2, midP });
+  }
+  nikonov::Triangle findBottomTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
+  {
+    RectangleData data(lbp, rtp);
+    nikonov::point_t botP1({ data.minX, data.minY });
+    nikonov::point_t botP2({ data.maxX, data.minY });
+    nikonov::point_t midP({ data.minX + data.width / 2, data.minY + data.height / 2 });
+    return nikonov::Triangle({ botP1, botP2, midP });
+  }
 }
