@@ -15,10 +15,10 @@ namespace nikonov
     void move(double x, double y) noexcept override;
     void scale(double k) noexcept override;
   private:
-    Triangle tgl_1_;
-    Triangle tgl_2_;
-    Triangle tgl_3_;
-    Triangle tgl_4_;
+    Triangle left_tgl_;
+    Triangle right_tgl_;
+    Triangle top_tgl_;
+    Triangle bot_tgl_;
   };
 }
 #endif

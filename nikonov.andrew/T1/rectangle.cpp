@@ -3,39 +3,6 @@
 #include "additional-utilities.hpp"
 namespace
 {
-  double findExtremeCoord(nikonov::Triangle tgls[], size_t size, bool findX, bool findMin)
-  {
-    double extremeX = tgls[0].getFrameRect().pos.x - tgls[0].getFrameRect().width / 2;
-    for (size_t i = 1; i < size; ++i)
-    {
-      double currX = tgls[i].getFrameRect().pos.x - tgls[i].getFrameRect().width / 2;
-      if (findMin)
-      {
-        extremeX = std::min(extremeX, currX);
-      }
-      else
-      {
-        extremeX = std::max(extremeX, currX);
-      }
-    }
-    return extremeX;
-  }
-  double findMinX(nikonov::Triangle tgls[], size_t size)
-  {
-    return findExtremeCoord(tgls, size, true, true);
-  }
-  double findMaxX(nikonov::Triangle tgls[], size_t size)
-  {
-    return findExtremeCoord(tgls, size, true, false);
-  }
-  double findMinY(nikonov::Triangle tgls[], size_t size)
-  {
-    return findExtremeCoord(tgls, size, false, true);
-  }
-  double findMaxY(nikonov::Triangle tgls[], size_t size)
-  {
-    return findExtremeCoord(tgls, size, false, false);
-  }
   struct RectangleData
   {
     double minX;
@@ -44,15 +11,13 @@ namespace
     double maxY;
     double width;
     double height;
-    nikonov::point_t midP;
     RectangleData(const nikonov::point_t &lbp, const nikonov::point_t &rtp):
       minX(std::min(lbp.x, rtp.x)),
       maxX(std::max(lbp.x, rtp.x)),
       minY(std::min(lbp.y, rtp.y)),
       maxY(std::max(lbp.y, rtp.y)),
       width(maxX - minX),
-      height(maxY - minY),
-      midP({ minX + width / 2, minY + height / 2 })
+      height(maxY - minY)
     {}
   };
   nikonov::Triangle findLeftTgl(const nikonov::point_t &lbp, const nikonov::point_t &rtp)
@@ -89,10 +54,10 @@ namespace
   }
 }
 nikonov::Rectangle::Rectangle(const point_t &lbp, const point_t &rtp):
-  tgl_1_(findLeftTgl(lbp, rtp)),
-  tgl_2_(findRightTgl(lbp, rtp)),
-  tgl_3_(findTopTgl(lbp, rtp)),
-  tgl_4_(findBottomTgl(lbp, rtp))
+  right_tgl_(findLeftTgl(lbp, rtp)),
+  left_tgl_(findRightTgl(lbp, rtp)),
+  top_tgl_(findTopTgl(lbp, rtp)),
+  bot_tgl_(findBottomTgl(lbp, rtp))
 {
   if (lbp.x >= rtp.x || lbp.y >= rtp.y)
   {
@@ -101,18 +66,14 @@ nikonov::Rectangle::Rectangle(const point_t &lbp, const point_t &rtp):
 }
 double nikonov::Rectangle::getArea() const noexcept
 {
-  return tgl_1_.getArea() + tgl_2_.getArea() + tgl_3_.getArea() + tgl_4_.getArea();
+  return right_tgl_.getArea() + left_tgl_.getArea() + top_tgl_.getArea() + bot_tgl_.getArea();
 }
 nikonov::rectangle_t nikonov::Rectangle::getFrameRect() const noexcept
 {
-  constexpr size_t triangleNum = 4;
-  Triangle tgls[] = { tgl_1_, tgl_2_, tgl_3_, tgl_4_ };
-  double minY = findMinY(tgls, triangleNum);
-  double minX = findMinX(tgls, triangleNum);
-  double maxY = findMaxY(tgls, triangleNum);
-  double maxX = findMaxX(tgls, triangleNum);
-  double rectWidth = maxX - minX;
-  double rectHeight = maxY - minY;
+  double minY = left_tgl_.getFrameRect().pos.y - left_tgl_.getFrameRect().height / 2;
+  double minX = left_tgl_.getFrameRect().pos.x - left_tgl_.getFrameRect().width / 2;
+  double rectWidth = bot_tgl_.getFrameRect().width;
+  double rectHeight = left_tgl_.getFrameRect().height;
   point_t pos = point_t({ minX + (rectWidth / 2), minY + (rectHeight / 2) });
   return rectangle_t({ rectWidth, rectHeight, pos });
 }
@@ -125,16 +86,16 @@ void nikonov::Rectangle::move(const point_t &newPos) noexcept
 }
 void nikonov::Rectangle::move(double x, double y) noexcept
 {
-  tgl_1_.move(x, y);
-  tgl_2_.move(x, y);
-  tgl_3_.move(x, y);
-  tgl_4_.move(x, y);
+  right_tgl_.move(x, y);
+  left_tgl_.move(x, y);
+  top_tgl_.move(x, y);
+  bot_tgl_.move(x, y);
 }
 void nikonov::Rectangle::scale(double k) noexcept
 {
   rectangle_t crntRect = getFrameRect();
-  ispScale(&tgl_1_, crntRect.pos.x, crntRect.pos.y, k);
-  ispScale(&tgl_2_, crntRect.pos.x, crntRect.pos.y, k);
-  ispScale(&tgl_3_, crntRect.pos.x, crntRect.pos.y, k);
-  ispScale(&tgl_4_, crntRect.pos.x, crntRect.pos.y, k);
+  ispScale(&right_tgl_, crntRect.pos.x, crntRect.pos.y, k);
+  ispScale(&left_tgl_, crntRect.pos.x, crntRect.pos.y, k);
+  ispScale(&top_tgl_, crntRect.pos.x, crntRect.pos.y, k);
+  ispScale(&bot_tgl_, crntRect.pos.x, crntRect.pos.y, k);
 }
